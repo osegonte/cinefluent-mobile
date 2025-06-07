@@ -1,15 +1,16 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAuth } from "@/contexts/AuthContext";
 import { 
   User, 
   Settings, 
   Crown, 
   Languages, 
   Bell, 
+  Moon, 
   Volume2,
   Download,
   Heart,
@@ -21,25 +22,28 @@ import {
   Star
 } from "lucide-react";
 
+/**
+ * Profile Component - User account management and settings
+ * 
+ * Features:
+ * - User profile display with stats
+ * - Premium subscription management
+ * - Learning preferences and settings
+ * - Account management options
+ * - Cross-platform mobile optimization
+ */
 const Profile = () => {
-  const { user, logout, isPremium } = useAuth();
-
-  if (!user) return null;
-
-  // User data from auth context
+  // User data - will be fetched from backend/Supabase
   const userStats = {
-    name: user.name,
-    email: user.email,
-    memberSince: new Date(user.created_at).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long' 
-    }),
-    totalPoints: 1876, // Will come from backend later
-    streak: 23,         // Will come from backend later
-    completedMovies: 3, // Will come from backend later
-    wordsLearned: 347,  // Will come from backend later
-    studyTime: "32h 15m", // Will come from backend later
-    isPremium: isPremium
+    name: "Alex Johnson",
+    email: "alex.johnson@email.com",
+    memberSince: "January 2024",
+    totalPoints: 1876,
+    streak: 23,
+    completedMovies: 3,
+    wordsLearned: 347,
+    studyTime: "32h 15m",
+    isPremium: true // Premium status
   };
 
   // Available languages for learning
@@ -72,7 +76,7 @@ const Profile = () => {
           <div className="flex items-center gap-4 mb-4">
             <Avatar className="w-16 h-16">
               <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                AJ
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -91,7 +95,7 @@ const Profile = () => {
             </Badge>
           </div>
 
-          {/* Stats Grid */}
+          {/* Stats Grid - optimized for mobile */}
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground tabular-nums">{userStats.totalPoints}</div>
@@ -193,6 +197,33 @@ const Profile = () => {
           </div>
         </Card>
 
+        {/* Premium Settings (only if premium) */}
+        {userStats.isPremium && (
+          <Card className="mobile-card p-4 mb-6">
+            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Crown className="w-5 h-5 text-primary" />
+              Premium Features
+            </h3>
+            <div className="space-y-3">
+              <Button variant="outline" className="w-full justify-between btn-mobile">
+                <div className="flex items-center gap-2">
+                  <Download className="w-4 h-4" />
+                  Download Manager
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              
+              <Button variant="outline" className="w-full justify-between btn-mobile">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Privacy Settings
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {/* Account Management Actions */}
         <div className="space-y-3">
           <Button variant="outline" className="w-full justify-between btn-mobile focus-ring">
@@ -223,7 +254,6 @@ const Profile = () => {
           <Button 
             variant="ghost" 
             className="w-full justify-start text-destructive hover:text-destructive btn-mobile"
-            onClick={logout}
           >
             <LogOut className="w-4 h-4 mr-2" />
             Sign Out
