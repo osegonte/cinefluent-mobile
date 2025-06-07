@@ -1,7 +1,35 @@
-// src/hooks/useApi.ts
+// src/hooks/useApi.ts - Fixed to work with your current setup
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiService } from '@/lib/api';
+
+// Simple API service to match your existing structure
+const API_BASE = 'http://localhost:8000';
+
+const apiService = {
+  async healthCheck() {
+    const response = await fetch(`${API_BASE}/`);
+    if (!response.ok) throw new Error('Health check failed');
+    return response.json();
+  },
+
+  async getMovies() {
+    const response = await fetch(`${API_BASE}/api/v1/movies`);
+    if (!response.ok) throw new Error('Failed to fetch movies');
+    return response.json();
+  },
+
+  async getFeaturedMovies() {
+    const response = await fetch(`${API_BASE}/api/v1/movies/featured`);
+    if (!response.ok) throw new Error('Failed to fetch featured movies');
+    return response.json();
+  },
+
+  async searchMovies(query: string) {
+    const response = await fetch(`${API_BASE}/api/v1/movies/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error('Search failed');
+    return response.json();
+  }
+};
 
 // Health Check Hook
 export function useHealthCheck() {
@@ -14,62 +42,28 @@ export function useHealthCheck() {
 }
 
 // Movies Hooks
-export function useMovies(page = 1, limit = 20) {
+export function useMovies() {
   return useQuery({
-    queryKey: ['movies', page, limit],
-    queryFn: () => apiService.getMovies(page, limit),
+    queryKey: ['movies'],
+    queryFn: () => apiService.getMovies(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
-export function useMovie(id: string) {
+export function useFeaturedMovies() {
   return useQuery({
-    queryKey: ['movie', id],
-    queryFn: () => apiService.getMovie(id),
-    enabled: !!id,
+    queryKey: ['movies', 'featured'],
+    queryFn: () => apiService.getFeaturedMovies(),
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 
-export function useMovieSearch(query: string) {
+export function useSearchMovies(query: string, enabled = true) {
   return useQuery({
     queryKey: ['movies', 'search', query],
     queryFn: () => apiService.searchMovies(query),
-    enabled: query.length > 2, // Only search if query is 3+ characters
+    enabled: enabled && query.length > 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-}
-
-// Progress Hooks
-export function useUserProgress(userId: string) {
-  return useQuery({
-    queryKey: ['progress', userId],
-    queryFn: () => apiService.getUserProgress(userId),
-    enabled: !!userId,
-  });
-}
-
-export function useUpdateProgress() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ userId, movieId, progress }: {
-      userId: string;
-      movieId: string;
-      progress: number;
-    }) => apiService.updateProgress(userId, movieId, progress),
-    onSuccess: (data, variables) => {
-      // Invalidate and refetch progress data
-      queryClient.invalidateQueries({ queryKey: ['progress', variables.userId] });
-    },
-  });
-}
-
-// Subtitles Hook
-export function useSubtitles(movieId: string, language = 'en') {
-  return useQuery({
-    queryKey: ['subtitles', movieId, language],
-    queryFn: () => apiService.getSubtitles(movieId, language),
-    enabled: !!movieId,
   });
 }
 
