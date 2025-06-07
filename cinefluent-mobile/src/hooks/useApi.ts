@@ -1,9 +1,9 @@
-// src/hooks/useApi.ts - Fixed to work with your current setup
+// src/hooks/useApi.ts - Updated for Railway deployment
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-// Simple API service to match your existing structure
-const API_BASE = 'http://localhost:8000';
+// 🚀 UPDATED: Use Railway API instead of localhost
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://cinefluent-api-production.up.railway.app';
 
 const apiService = {
   async healthCheck() {
@@ -18,6 +18,12 @@ const apiService = {
     return response.json();
   },
 
+  async getCategories() {
+    const response = await fetch(`${API_BASE}/api/v1/categories`);
+    if (!response.ok) throw new Error('Failed to fetch categories');
+    return response.json();
+  },
+
   async getFeaturedMovies() {
     const response = await fetch(`${API_BASE}/api/v1/movies/featured`);
     if (!response.ok) throw new Error('Failed to fetch featured movies');
@@ -27,6 +33,37 @@ const apiService = {
   async searchMovies(query: string) {
     const response = await fetch(`${API_BASE}/api/v1/movies/search?q=${encodeURIComponent(query)}`);
     if (!response.ok) throw new Error('Search failed');
+    return response.json();
+  },
+
+  async registerUser(userData: {
+    email: string;
+    password: string;
+    name: string;
+  }) {
+    const response = await fetch(`${API_BASE}/api/v1/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) throw new Error('Registration failed');
+    return response.json();
+  },
+
+  async loginUser(credentials: {
+    email: string;
+    password: string;
+  }) {
+    const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
+    if (!response.ok) throw new Error('Login failed');
     return response.json();
   }
 };
@@ -58,12 +95,41 @@ export function useFeaturedMovies() {
   });
 }
 
+export function useCategories() {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: () => apiService.getCategories(),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
 export function useSearchMovies(query: string, enabled = true) {
   return useQuery({
     queryKey: ['movies', 'search', query],
     queryFn: () => apiService.searchMovies(query),
     enabled: enabled && query.length > 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// Auth Hooks
+export function useRegister() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: apiService.registerUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+}
+
+export function useLogin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: apiService.loginUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
   });
 }
 

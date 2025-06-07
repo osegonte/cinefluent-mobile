@@ -1,9 +1,9 @@
-// src/components/ConnectionTest.tsx
+// src/components/ConnectionTest.tsx - Updated for Railway
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Loader2, Wifi, WifiOff } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, Wifi, WifiOff, Cloud } from 'lucide-react';
 import { useHealthCheck, useConnectionStatus } from '@/hooks/useApi';
 
 export function ConnectionTest() {
@@ -58,8 +58,11 @@ export function ConnectionTest() {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Backend URL:</span>
-          <span className="text-xs text-muted-foreground">localhost:8000</span>
+          <span className="text-sm font-medium">Backend:</span>
+          <div className="flex items-center gap-2">
+            <Cloud className="h-4 w-4 text-blue-500" />
+            <span className="text-xs text-muted-foreground">Railway (Production)</span>
+          </div>
         </div>
 
         {healthData && (
@@ -70,6 +73,11 @@ export function ConnectionTest() {
             <p className="text-xs text-green-600 dark:text-green-300">
               Status: {healthData.status}
             </p>
+            {healthData.database && (
+              <p className="text-xs text-green-600 dark:text-green-300">
+                Database: {healthData.database}
+              </p>
+            )}
           </div>
         )}
 
@@ -79,7 +87,7 @@ export function ConnectionTest() {
               ❌ Connection Failed
             </p>
             <p className="text-xs text-red-600 dark:text-red-300">
-              Make sure your FastAPI server is running on localhost:8000
+              Unable to connect to Railway API. Check your internet connection.
             </p>
           </div>
         )}
@@ -95,7 +103,7 @@ export function ConnectionTest() {
               Testing...
             </>
           ) : (
-            'Test Connection'
+            'Test Railway Connection'
           )}
         </Button>
       </CardContent>
