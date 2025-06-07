@@ -1,0 +1,3 @@
+[submodule "cinefluent-mobile"]
+	path = cinefluent-mobile
+	url = https://github.com/osegonte/cinefluent-mobile.git
