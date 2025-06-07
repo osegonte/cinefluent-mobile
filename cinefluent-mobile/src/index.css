@@ -1,0 +1,413 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light theme - CineFluent colors */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221 83% 53%; /* CineFluent Blue #3D7BFF */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 221 83% 53%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
+    --radius: 0.75rem;
+    
+    /* CineFluent brand colors */
+    --success: 142 76% 45%;
+    --warning: 48 100% 63%;
+    --surface-alt: 210 16% 93%;
+    --bg-primary: 0 0% 100%;
+    --bg-secondary: 0 0% 98%;
+    --text-primary: 222.2 84% 4.9%;
+    --text-secondary: 215.4 16.3% 46.9%;
+    --text-disabled: 215.4 16.3% 65%;
+    
+    /* Mobile-specific safe areas */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
+    --safe-area-inset-right: env(safe-area-inset-right);
+  }
+
+  .dark {
+    /* Dark theme - CineFluent palette */
+    --background: 240 6% 5.5%; /* #0E0E12 */
+    --foreground: 0 0% 96%; /* #F5F6F7 */
+    --card: 240 4% 10%; /* #1A1A1F */
+    --card-foreground: 0 0% 96%;
+    --popover: 240 4% 13%; /* #222228 */
+    --popover-foreground: 0 0% 96%;
+    --primary: 221 83% 53%; /* CineFluent Blue #3D7BFF */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 13%;
+    --secondary-foreground: 0 0% 78%;
+    --muted: 240 4% 13%;
+    --muted-foreground: 240 5% 64%;
+    --accent: 221 83% 53%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 76% 67%; /* #FF5B5B */
+    --destructive-foreground: 0 0% 96%;
+    --border: 240 4% 18%; /* #2D2D34 */
+    --input: 240 4% 18%;
+    --ring: 221 83% 53%;
+    
+    /* CineFluent dark brand colors */
+    --success: 142 70% 49%; /* #3CCB7F */
+    --warning: 48 100% 70%; /* #FFD864 */
+    --surface-alt: 240 2% 14%; /* #222228 */
+    --bg-primary: 240 6% 5.5%; /* #0E0E12 */
+    --bg-secondary: 240 4% 10%; /* #1A1A1F */
+    --text-primary: 0 0% 96%; /* #F5F6F7 */
+    --text-secondary: 240 5% 78%; /* #C5C7CC */
+    --text-disabled: 240 5% 40%; /* #64666B */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* Enhanced mobile scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent zoom on input focus for mobile */
+    font-size: 16px;
+  }
+
+  /* Mobile-first input handling */
+  @media (max-width: 768px) {
+    input[type="search"],
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+  }
+
+  /* Safe area support */
+  .h-safe-area-inset-bottom {
+    height: var(--safe-area-inset-bottom);
+  }
+  
+  .pt-safe-area-inset-top {
+    padding-top: var(--safe-area-inset-top);
+  }
+  
+  .pb-safe-area-inset-bottom {
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+}
+
+@layer components {
+  /* Enhanced mobile-first card styling */
+  .mobile-card {
+    @apply rounded-xl bg-card backdrop-blur-sm border border-border/50 shadow-lg;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    /* Better touch feedback */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .mobile-card:hover {
+    @apply shadow-xl;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Mobile touch optimization */
+  .mobile-card:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+
+  .dark .mobile-card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .mobile-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Enhanced progress bars */
+  .progress-enhanced {
+    @apply h-2 bg-muted rounded-full overflow-hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .progress-enhanced .progress-fill {
+    @apply h-full bg-primary rounded-full transition-all duration-500 ease-out min-w-[8px];
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  }
+
+  /* Typography hierarchy - Mobile optimized */
+  .text-headline {
+    @apply text-2xl font-bold tracking-tight text-foreground;
+  }
+  
+  .text-title {
+    @apply text-lg font-semibold text-foreground;
+  }
+  
+  .text-body {
+    @apply text-sm text-muted-foreground leading-relaxed;
+  }
+  
+  .text-caption {
+    @apply text-xs text-muted-foreground/80 font-medium;
+  }
+
+  /* Brand utilities */
+  .text-success {
+    color: hsl(var(--success));
+  }
+  
+  .text-warning {
+    color: hsl(var(--warning));
+  }
+  
+  .bg-success {
+    background-color: hsl(var(--success));
+  }
+  
+  .bg-warning {
+    background-color: hsl(var(--warning));
+  }
+  
+  .bg-surface-alt {
+    background-color: hsl(var(--surface-alt));
+  }
+
+  /* Enhanced mobile button improvements */
+  .btn-mobile {
+    @apply min-h-[44px] px-4 py-3 rounded-lg font-medium transition-all duration-200;
+    transform: translateZ(0); /* Hardware acceleration */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    /* Ensure minimum touch target size */
+    min-width: 44px;
+  }
+  
+  .btn-mobile:active {
+    @apply scale-95;
+    transform: scale(0.95) translateZ(0);
+  }
+
+  .btn-mobile:hover {
+    transform: translateY(-1px) translateZ(0);
+  }
+
+  /* Mobile-optimized touch targets */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-bg-light {
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(221 83% 98%) 50%, 
+      hsl(var(--background)) 100%);
+  }
+
+  .gradient-bg-dark {
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(240 6% 8%) 50%, 
+      hsl(var(--background)) 100%);
+  }
+
+  /* Sticky progress footer */
+  .sticky-progress {
+    @apply fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-3 z-40;
+    padding-bottom: calc(0.75rem + var(--safe-area-inset-bottom));
+    transition: all 0.3s ease;
+  }
+
+  /* Enhanced focus states for accessibility */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Tabular numbers for consistent metrics */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* Mobile scroll improvements */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Pull-to-refresh indicator */
+  .pull-to-refresh {
+    @apply flex items-center justify-center py-4 text-muted-foreground;
+    min-height: 60px;
+    transition: all 0.3s ease;
+  }
+
+  /* Mobile navigation enhancements */
+  .mobile-nav {
+    @apply bg-background/95 backdrop-blur-md border-t border-border;
+    padding-bottom: var(--safe-area-inset-bottom);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* Enhanced skeleton loading animation */
+@keyframes shimmer {
+  0% { 
+    background-position: -200px 0; 
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% { 
+    background-position: calc(200px + 100%) 0; 
+    opacity: 1;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg, 
+    hsl(var(--muted)) 25%, 
+    hsl(var(--muted) / 0.5) 50%, 
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite ease-in-out;
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Enhanced micro-interactions */
+@keyframes bounce-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 0.6s ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Improved scrollbar styling - Hidden on mobile */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.5);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.7);
+  }
+}
+
+/* Hide scrollbar for mobile swipe areas */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Disable text selection on UI elements */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Improve touch scrolling */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Optimize animations for mobile */
+  @media (prefers-reduced-motion: no-preference) {
+    .mobile-card {
+      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    }
+  }
+}
+
+/* iOS-specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  .ios-fix {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+  
+  /* Fix iOS input zoom */
+  @media screen and (max-width: 768px) {
+    input {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Android-specific optimizations */
+@media (pointer: coarse) {
+  .touch-optimization {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
