@@ -1,227 +1,198 @@
+# 🎬 CineFluent Mobile
 
-# CineFluent - Language Learning Through Movies
+A mobile-first language learning app that uses movies to teach languages through interactive subtitles and vocabulary building.
 
-A mobile-first language learning application that uses movies to teach languages through interactive subtitles and vocabulary building.
+![CineFluent Preview](https://via.placeholder.com/800x400/3D7BFF/white?text=CineFluent+Mobile+Preview)
+
+## ✨ Features
+
+- 🎥 **Interactive Movie Learning** - Learn languages through your favorite films
+- 📱 **Mobile-First Design** - Optimized for iOS and Android devices
+- 🎯 **Progress Tracking** - Monitor your learning journey with detailed analytics
+- 👥 **Community Features** - Connect with fellow learners and share progress
+- 🌙 **Dark Mode Support** - Beautiful themes for any time of day
+- 🔄 **Real-time Sync** - Progress synced across all devices
+- 💫 **PWA Ready** - Install as a native app experience
 
 ## 🚀 Quick Start
 
-### Web Development
-```bash
-npm install
-npm run dev
-```
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Modern web browser
 
-### Mobile Development (Capacitor)
+### Installation
 
-#### Initial Setup
 ```bash
+# Clone the repository
+git clone <your-repo-url>
+cd cinefluent-mobile
+
 # Install dependencies
 npm install
 
-# Initialize Capacitor (already configured)
-npx cap init
+# Copy environment file and configure
+cp .env.example .env.local
+# Edit .env.local with your backend URL
 
-# Add mobile platforms
-npx cap add ios
-npx cap add android
+# Start development server
+npm run dev
 ```
 
-#### Running on Mobile Devices
+Visit `http://localhost:8080` to see the app running.
 
-1. **Export to GitHub**: Use the "Export to GitHub" button in Lovable
-2. **Clone locally**: `git clone <your-repo-url>`
-3. **Install dependencies**: `npm install`
-4. **Build the project**: `npm run build`
-5. **Sync with Capacitor**: `npx cap sync`
+### Backend Setup
+This frontend connects to a FastAPI backend. You'll need to:
+1. Set up the backend API (see backend repository)
+2. Configure `VITE_API_BASE_URL` in `.env.local`
+3. Ensure CORS is properly configured
 
-#### iOS Development
-```bash
-# Requires macOS with Xcode
-npx cap run ios
-# or open in Xcode
-npx cap open ios
-```
+## 🏗️ Tech Stack
 
-#### Android Development
-```bash
-# Requires Android Studio
-npx cap run android
-# or open in Android Studio
-npx cap open android
-```
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, Shadcn/UI components
+- **State Management**: React Context, TanStack Query
+- **Routing**: React Router v6
+- **Mobile**: PWA-ready, Capacitor for native builds
+- **Icons**: Lucide React
+- **Build Tool**: Vite with SWC
 
-## 🏗️ Architecture
+## 📱 Mobile Features
 
-### Frontend Stack
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling
-- **Shadcn/UI** component library
-- **React Router** for navigation
-- **Capacitor** for native mobile deployment
-
-### Mobile Features
-- Native iOS and Android compilation
-- Offline capability (PWA)
-- Touch-optimized interactions
-- Safe area support
-- Hardware acceleration
-- Platform-specific optimizations
-
-## 📱 Mobile Optimizations
-
-### iOS Specific
-- Safe area insets support
-- iOS-style haptic feedback ready
+### iOS Support
+- Safe area handling for notched devices
+- iOS-style navigation and haptics
+- App Store deployment ready
 - Dynamic Type support
-- Native scroll behavior
-- SF Symbols icon compatibility
 
-### Android Specific
-- Material Design 3 compliance
+### Android Support  
+- Material Design 3 principles
 - Android back gesture support
-- Status bar theming
-- Adaptive icons ready
-- Android-style ripple effects
+- Play Store deployment ready
+- Adaptive icons
 
 ### Cross-Platform
-- 44×44pt minimum touch targets
-- Optimized scroll performance
-- Pull-to-refresh patterns
-- Gesture navigation
-- Responsive breakpoints
+- 44px minimum touch targets
+- Swipe gestures and pull-to-refresh
+- Offline capability (planned)
+- Performance optimized
+
+## 🧩 Component Architecture
+
+```
+src/
+├── components/
+│   ├── ui/              # Base UI components (Shadcn/UI)
+│   ├── SearchBar.tsx    # Advanced search with filters
+│   ├── NavigationTabs.tsx # Bottom tab navigation
+│   └── MobileProgressCard.tsx # Progress tracking cards
+├── pages/
+│   ├── Auth/           # Login/Register pages
+│   ├── Learn.tsx       # Main learning interface
+│   ├── Progress.tsx    # Progress tracking
+│   ├── Community.tsx   # Social features
+│   └── Profile.tsx     # User management
+├── hooks/
+│   └── useApi.ts       # API integration hooks
+├── contexts/
+│   └── AuthContext.tsx # Authentication state
+└── lib/
+    ├── api.ts          # API client
+    └── utils.ts        # Utilities
+```
 
 ## 🎨 Design System
 
 ### Colors
-- **Primary**: #3D7BFF (Brand Blue)
-- **Dark Background**: #0E0E12
-- **Light Background**: #FFFFFF
-- **Success**: #3CCB7F
+- **Primary**: #3D7BFF (CineFluent Blue)
+- **Success**: #3CCB7F 
 - **Warning**: #FFD864
 - **Destructive**: #FF5B5B
 
 ### Typography
-- **System Fonts**: SF Pro (iOS) / Roboto (Android)
-- **Font Sizes**: 12px, 14px, 16px, 18px, 24px, 32px
-- **Dynamic Type**: Supports iOS accessibility scaling
-
-### Spacing
-- **Grid**: 8pt base grid system
-- **Border Radius**: 12pt for cards, 8pt for buttons
-- **Safe Areas**: Automatic iOS/Android safe area handling
-
-## 🧩 Components
-
-### Core Components
-- `SearchBar` - Advanced search with filters
-- `MobileProgressCard` - Progress tracking cards
-- `NavigationTabs` - Bottom tab navigation
-- `ThemeProvider` - Dark/light mode support
-
-### UI Components (Shadcn/UI)
-- Cards, Buttons, Inputs
-- Sheets, Dialogs, Tooltips
-- Progress bars, Badges, Avatars
-- Navigation, Tabs, Separators
-
-## 📊 Features
-
-### 🎬 Content Discovery
-- Movie search and filtering
-- Category browsing
-- Difficulty level sorting
-- Language-specific content
-- Premium content gating
-
-### 📈 Progress Tracking
-- Learning streaks
-- Weekly goals
-- Vocabulary progress
-- Achievement system
-- Analytics dashboard
-
-### 👥 Community Features
-- Discussion forums
-- Leaderboards
-- Social interactions
-- Content sharing
-- Study groups
-
-### ⚙️ Settings & Preferences
-- Language selection
-- Learning goals
-- Notification settings
-- Theme preferences
-- Privacy controls
-
-## 🔧 Development Commands
-
-```bash
-# Development
-npm run dev              # Start development server
-npm run build           # Build for production
-npm run preview         # Preview production build
-npm run lint            # Run ESLint
-npm run type-check      # TypeScript type checking
-
-# Mobile Development
-npx cap sync            # Sync web assets to native
-npx cap run ios         # Run on iOS simulator/device
-npx cap run android     # Run on Android emulator/device
-npx cap open ios        # Open iOS project in Xcode
-npx cap open android    # Open Android project in Android Studio
-
-# Capacitor Updates
-npx cap update          # Update Capacitor and plugins
-npx cap doctor          # Check Capacitor setup
-```
-
-## 📦 Build & Deployment
-
-### Web Deployment
-The app is automatically deployed via Lovable's hosting platform.
-
-### Mobile App Store Deployment
-
-#### iOS App Store
-1. Build and archive in Xcode
-2. Upload to App Store Connect
-3. Submit for review
-4. Configure App Store metadata
-
-#### Google Play Store
-1. Generate signed APK/AAB in Android Studio
-2. Upload to Google Play Console
-3. Complete store listing
-4. Submit for review
-
-## 🔒 Security & Privacy
-
-- HTTPS/TLS encryption
-- Secure authentication
-- Data privacy compliance (GDPR)
-- Input validation and sanitization
-- XSS and CSRF protection
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- System fonts (SF Pro on iOS, Roboto on Android)
+- Responsive sizing with mobile optimization
+- Dark mode support
 
 ## 🤝 Contributing
 
+We welcome contributions! Here's how you can help:
+
+### 🎯 Priority Areas
+- [ ] Mobile UI/UX improvements
+- [ ] Interactive subtitle enhancements  
+- [ ] Offline mode implementation
+- [ ] Accessibility improvements
+- [ ] Performance optimization
+- [ ] Test coverage
+
+### Development Workflow
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and test thoroughly
+4. Commit with clear messages: `git commit -m 'Add amazing feature'`
+5. Push to your branch: `git push origin feature/amazing-feature`
+6. Open a Pull Request
 
-## 📞 Support
+### Code Style
+- Use TypeScript for type safety
+- Follow mobile-first responsive design
+- Use Tailwind CSS utility classes
+- Write accessible HTML with proper ARIA labels
+- Add JSDoc comments for complex functions
 
-For support and questions:
-- Documentation: [Project Documentation](./src/docs/)
-- Issues: GitHub Issues
-- Community: Discord/Slack channels
+### Testing
+```bash
+npm run type-check    # TypeScript checking
+npm run lint         # ESLint
+npm run build        # Production build test
+```
+
+## 📖 Documentation
+
+- [API Integration Guide](./docs/api-integration.md)
+- [Component Documentation](./docs/components.md)
+- [Mobile Optimization](./docs/mobile-optimization.md)
+- [Deployment Guide](./docs/deployment.md)
+
+## 🚢 Deployment
+
+### Web (Vercel)
+```bash
+npm run build
+# Deploy dist/ folder to Vercel
+```
+
+### Mobile Apps
+```bash
+# iOS (requires macOS + Xcode)
+npx cap add ios
+npx cap run ios
+
+# Android (requires Android Studio)
+npx cap add android
+npx cap run android
+```
+
+## 🐛 Issues & Support
+
+- 🐛 [Report a Bug](../../issues/new?template=bug_report.md)
+- 💡 [Request a Feature](../../issues/new?template=feature_request.md)
+- 💬 [Ask a Question](../../discussions)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Vite](https://vitejs.dev/) and [React](https://reactjs.org/)
+- UI components by [Shadcn/UI](https://ui.shadcn.com/)
+- Icons by [Lucide](https://lucide.dev/)
+- Styling by [Tailwind CSS](https://tailwindcss.com/)
 
 ---
 
-**CineFluent** - Learn languages through the magic of cinema! 🎬✨
+**Made with ❤️ by the CineFluent team**
+
+*Learn languages through the magic of cinema* 🎬✨

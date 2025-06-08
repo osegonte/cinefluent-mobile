@@ -28,3 +28,16 @@ dist-ssr
 .env.local
 .env.production
 .env.development
+
+# Additional cleanup entries
+.env.local
+.env.production
+.env.backup
+dist/
+coverage/
+*.log
+.DS_Store
+debug-*.js
+test-*.js
+*.backup
+.temp/

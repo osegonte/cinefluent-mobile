@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:api": "./test-api.sh",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules/.vite",
+    "preview:mobile": "vite preview --host --port 8080"
   },
   "dependencies": {
     "@capacitor/android": "^7.3.0",
