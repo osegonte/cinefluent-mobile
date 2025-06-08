@@ -1,13 +1,12 @@
-// src/components/ConnectionTest.tsx - Updated for Railway
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, Loader2, Wifi, WifiOff, Cloud } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, Wifi, WifiOff, Cloud, RefreshCw } from 'lucide-react';
 import { useHealthCheck, useConnectionStatus } from '@/hooks/useApi';
 
 export function ConnectionTest() {
-  const { data: healthData, isLoading, isError, refetch } = useHealthCheck();
+  const { data: healthData, isLoading, isError, refetch, error } = useHealthCheck();
   const { isOnline, apiStatus, isConnected } = useConnectionStatus();
 
   const getStatusIcon = () => {
@@ -19,7 +18,7 @@ export function ConnectionTest() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'connected':
-        return <Badge variant="default" className="bg-green-500">Connected</Badge>;
+        return <Badge variant="default" className="bg-green-500 hover:bg-green-600">Connected</Badge>;
       case 'disconnected':
         return <Badge variant="destructive">Disconnected</Badge>;
       case 'checking':
@@ -30,11 +29,11 @@ export function ConnectionTest() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           {getStatusIcon()}
-          API Connection Status
+          Railway API Status
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -61,7 +60,7 @@ export function ConnectionTest() {
           <span className="text-sm font-medium">Backend:</span>
           <div className="flex items-center gap-2">
             <Cloud className="h-4 w-4 text-blue-500" />
-            <span className="text-xs text-muted-foreground">Railway (Production)</span>
+            <span className="text-xs text-muted-foreground">Railway Production</span>
           </div>
         </div>
 
@@ -87,7 +86,7 @@ export function ConnectionTest() {
               ❌ Connection Failed
             </p>
             <p className="text-xs text-red-600 dark:text-red-300">
-              Unable to connect to Railway API. Check your internet connection.
+              {error instanceof Error ? error.message : 'Unable to connect to Railway API'}
             </p>
           </div>
         )}
@@ -96,6 +95,7 @@ export function ConnectionTest() {
           onClick={() => refetch()} 
           disabled={isLoading}
           className="w-full"
+          variant="outline"
         >
           {isLoading ? (
             <>
@@ -103,7 +103,10 @@ export function ConnectionTest() {
               Testing...
             </>
           ) : (
-            'Test Railway Connection'
+            <>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Test Connection
+            </>
           )}
         </Button>
       </CardContent>

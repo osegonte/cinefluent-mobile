@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Play, Clock, Star, Globe } from "lucide-react";
+import { Search, Play, Clock, Star, Globe, Bookmark, Crown } from "lucide-react";
 import { ConnectionTest } from "@/components/ConnectionTest";
 import { useMovies, useFeaturedMovies, useSearchMovies } from "@/hooks/useApi";
 
@@ -21,18 +21,23 @@ const Learn = () => {
   // Determine which movies to display
   const displayMovies = searchQuery.length > 2 
     ? searchData?.movies || []
-    : featuredData?.movies || [];
+    : featuredData?.movies || moviesData?.movies || [];
 
   const isLoading = searchQuery.length > 2 ? searchLoading : (featuredLoading || moviesLoading);
 
   const handleSearch = () => {
-    // Search is handled automatically by the useSearchMovies hook
     console.log("Searching for:", searchQuery);
   };
 
   const handleStartLearning = (movie: any) => {
     console.log("Starting movie:", movie.title);
+    // TODO: Navigate to lesson view
     alert(`Starting "${movie.title}" - Movie player coming soon!`);
+  };
+
+  const handleBookmark = (movie: any) => {
+    console.log("Bookmarking:", movie.title);
+    // TODO: Implement bookmark functionality
   };
 
   // Loading skeleton
@@ -53,7 +58,7 @@ const Learn = () => {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2].map((i) => (
+          {[1, 2, 3].map((i) => (
             <Card key={i} className="overflow-hidden">
               <div className="aspect-[2/3] bg-gray-200 animate-pulse"></div>
               <CardContent className="p-4">
@@ -82,8 +87,11 @@ const Learn = () => {
           </div>
           <h3 className="font-medium text-foreground mb-2">Connection Error</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Unable to load movies. Please check your connection.
+            Unable to load movies. Please check your connection and try again.
           </p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
         </Card>
       </div>
     );
@@ -120,6 +128,11 @@ const Learn = () => {
               Search
             </Button>
           </div>
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {searchLoading ? 'Searching...' : `Found ${displayMovies.length} results`}
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -127,7 +140,7 @@ const Learn = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayMovies.length > 0 ? (
           displayMovies.map((movie) => (
-            <Card key={movie.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={movie.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
               <div className="aspect-[2/3] relative">
                 <img
                   src={movie.thumbnail_url}
@@ -138,11 +151,22 @@ const Learn = () => {
                   }}
                 />
                 {movie.is_premium && (
-                  <div className="absolute top-2 right-2 bg-purple-500 text-white px-2 py-1 rounded text-xs">
+                  <div className="absolute top-2 left-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <Crown className="w-3 h-3" />
                     Premium
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="absolute top-2 right-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 bg-black/20 hover:bg-black/40 text-white rounded-full"
+                    onClick={() => handleBookmark(movie)}
+                  >
+                    <Bookmark className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Button size="lg" className="gap-2" onClick={() => handleStartLearning(movie)}>
                     <Play className="h-4 w-4" />
                     Start Learning
@@ -150,8 +174,9 @@ const Learn = () => {
                 </div>
               </div>
               <CardContent className="p-4">
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-lg">{movie.title}</h3>
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg line-clamp-1">{movie.title}</h3>
+                  
                   <div className="flex items-center justify-between">
                     <Badge variant="secondary">
                       {movie.languages && movie.languages[0] ? movie.languages[0] : 'Multiple'}
@@ -163,6 +188,7 @@ const Learn = () => {
                       {movie.difficulty_level}
                     </Badge>
                   </div>
+                  
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
@@ -173,8 +199,9 @@ const Learn = () => {
                       {movie.vocabulary_count} words
                     </div>
                   </div>
+                  
                   {movie.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                    <p className="text-sm text-muted-foreground line-clamp-2">
                       {movie.description}
                     </p>
                   )}
@@ -198,12 +225,12 @@ const Learn = () => {
       </div>
 
       {/* Show total count if we have data */}
-      {(moviesData || featuredData) && (
+      {displayMovies.length > 0 && (
         <div className="text-center text-sm text-muted-foreground">
           {searchQuery ? (
             `Found ${displayMovies.length} movies matching "${searchQuery}"`
           ) : (
-            `Showing ${displayMovies.length} featured movies`
+            `Showing ${displayMovies.length} movies`
           )}
         </div>
       )}
