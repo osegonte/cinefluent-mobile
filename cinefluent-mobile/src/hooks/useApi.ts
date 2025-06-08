@@ -35,10 +35,8 @@ export function useFeaturedMovies() {
     queryFn: () => apiService.getFeaturedMovies(),
     staleTime: 10 * 60 * 1000, // 10 minutes
     retry: (failureCount, error) => {
-      // If featured movies fail, don't retry too aggressively
       return failureCount < 2;
     },
-    // Fallback to regular movies if featured fails
     placeholderData: { movies: [] },
   });
 }
@@ -49,7 +47,6 @@ export function useSearchMovies(query: string, enabled = true) {
     queryFn: () => apiService.searchMovies(query),
     enabled: enabled && query.length > 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    // Don't retry search queries as aggressively
     retry: 1,
   });
 }

@@ -1,11 +1,11 @@
-// src/lib/api.ts - Fixed to match your actual backend response format
+// src/lib/api.ts - Fixed API service
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://cinefluent-api-production-5082.up.railway.app';
 
 export interface Movie {
   id: string;
   title: string;
   description: string;
-  duration_minutes: number;
+  duration_minutes: number; // Keep existing field name
   difficulty_level: string;
   category: string;
   language: string;
@@ -156,8 +156,8 @@ class ApiService {
     return response;
   }
 
-  async getProfile(): Promise<User> {
-    return this.request<User>('/api/v1/auth/me');
+  async getProfile(): Promise<{ user: User; profile: Profile }> {
+    return this.request<{ user: User; profile: Profile }>('/api/v1/auth/me');
   }
 
   // Movies
@@ -178,7 +178,8 @@ class ApiService {
     const query = searchParams.toString();
     const endpoint = `/api/v1/movies${query ? `?${query}` : ''}`;
     
-    return this.request<Movie[]>(endpoint);
+    const result = await this.request<{ movies: Movie[] }>(endpoint);
+    return result.movies || [];
   }
 
   async searchMovies(query: string): Promise<{ movies: Movie[] }> {
@@ -191,11 +192,13 @@ class ApiService {
 
   // Categories and Languages
   async getCategories(): Promise<any[]> {
-    return this.request<any[]>('/api/v1/categories');
+    const result = await this.request<{ categories: any[] }>('/api/v1/categories');
+    return result.categories || [];
   }
 
   async getLanguages(): Promise<any[]> {
-    return this.request<any[]>('/api/v1/languages');
+    const result = await this.request<{ languages: string[] }>('/api/v1/languages');
+    return result.languages || [];
   }
 }
 

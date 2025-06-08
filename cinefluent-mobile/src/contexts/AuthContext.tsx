@@ -40,8 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         apiService.setToken(token);
         const userData = await apiService.getProfile();
         console.log('✅ Token verified, user loaded:', userData);
-        setUser(userData);
-        // Note: We don't have profile endpoint yet, so profile will be null for now
+        setUser(userData.user);
+        setProfile(userData.profile);
       } catch (error) {
         console.error('❌ Token verification failed:', error);
         localStorage.removeItem('auth_token');
