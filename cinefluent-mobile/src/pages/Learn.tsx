@@ -1,17 +1,14 @@
-// src/pages/Learn.tsx - Temporarily add debug component
+// src/pages/Learn.tsx - CLEAN VERSION (remove test components)
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, Play, Clock, Star, Globe, Bookmark, Crown } from "lucide-react";
-import { ConnectionTest } from "@/components/ConnectionTest";
-import { DebugApiTest } from "@/components/DebugApiTest";
 import { useMovies, useFeaturedMovies, useSearchMovies } from "@/hooks/useApi";
 
 const Learn = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [showDebug, setShowDebug] = useState(true); // Show debug by default
 
   // Use real API data
   const { data: moviesData, isLoading: moviesLoading, error: moviesError } = useMovies();
@@ -43,28 +40,6 @@ const Learn = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      {/* Debug Section - Remove this later */}
-      {showDebug && (
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">🔧 Debug Mode</h2>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowDebug(!showDebug)}
-            >
-              {showDebug ? 'Hide Debug' : 'Show Debug'}
-            </Button>
-          </div>
-          <DebugApiTest />
-        </div>
-      )}
-
-      {/* Connection Status */}
-      <div className="mb-6">
-        <ConnectionTest />
-      </div>
-
       {/* Search Section */}
       <Card>
         <CardHeader>
@@ -212,10 +187,10 @@ const Learn = () => {
                 <Search className="w-16 h-16 mx-auto" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                {searchQuery ? 'No movies found' : 'No movies available'}
+                {searchQuery ? 'No movies found' : 'No movies available yet'}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                {searchQuery ? 'Try a different search term' : 'Movies will appear here once loaded'}
+                {searchQuery ? 'Try a different search term' : 'Movies will appear here once your database is populated'}
               </p>
               {!searchQuery && (
                 <Button 

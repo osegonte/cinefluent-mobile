@@ -1,4 +1,4 @@
-// src/pages/Auth/LoginPage.tsx - Updated with test credentials
+// src/pages/Auth/LoginPage.tsx - FIXED VERSION
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,10 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
-import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, LogIn, Copy } from 'lucide-react';
 
 export default function LoginPage() {
-  // Pre-fill with your test credentials
+  // Pre-fill with the WORKING test credentials from your backend
   const [email, setEmail] = useState('enabled@example.com');
   const [password, setPassword] = useState('TestPass123!');
   const [showPassword, setShowPassword] = useState(false);
@@ -25,14 +25,23 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
 
+    console.log('🔐 Attempting login with:', { email, password: password.substring(0, 4) + '...' });
+
     try {
       await login(email, password);
+      console.log('✅ Login successful, redirecting...');
       navigate('/learn');
     } catch (err) {
+      console.error('❌ Login failed:', err);
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const copyCredentials = () => {
+    setEmail('enabled@example.com');
+    setPassword('TestPass123!');
   };
 
   return (
@@ -122,11 +131,41 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Test credentials helper */}
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Test Credentials (pre-filled):</p>
-            <p className="text-xs text-gray-500 dark:text-gray-500">Email: enabled@example.com</p>
-            <p className="text-xs text-gray-500 dark:text-gray-500">Password: TestPass123!</p>
+          {/* Updated Test credentials helper */}
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                🧪 Test Credentials (pre-filled):
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={copyCredentials}
+                className="text-xs h-8"
+              >
+                <Copy className="w-3 h-3 mr-1" />
+                Use Test Account
+              </Button>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-blue-600 dark:text-blue-300 font-mono">
+                📧 enabled@example.com
+              </p>
+              <p className="text-xs text-blue-600 dark:text-blue-300 font-mono">
+                🔑 TestPass123!
+              </p>
+            </div>
+            <p className="text-xs text-blue-500 dark:text-blue-400 mt-2">
+              This is a working test account on your Railway backend
+            </p>
+          </div>
+
+          {/* API Connection Status */}
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">
+              API: {import.meta.env.VITE_API_BASE_URL || 'Railway Production'}
+            </p>
           </div>
         </CardContent>
       </Card>
