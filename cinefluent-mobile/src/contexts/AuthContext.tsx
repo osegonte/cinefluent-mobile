@@ -1,17 +1,10 @@
+// src/contexts/AuthContext.tsx - Fixed to match your backend response
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { apiService } from '@/lib/api';
-
-interface User {
-  id: string;
-  email: string;
-  full_name?: string;
-  name?: string;
-  subscription_tier?: 'free' | 'premium' | 'pro';
-  created_at?: string;
-}
+import { apiService, User, Profile } from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
+  profile: Profile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
@@ -32,29 +25,32 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    initializeAuth();
+  }, []);
+
+  const initializeAuth = async () => {
     const token = localStorage.getItem('auth_token');
     if (token) {
       console.log('🔍 Found existing token, verifying...');
-      verifyToken();
+      try {
+        apiService.setToken(token);
+        const userData = await apiService.getProfile();
+        console.log('✅ Token verified, user loaded:', userData);
+        setUser(userData);
+        // Note: We don't have profile endpoint yet, so profile will be null for now
+      } catch (error) {
+        console.error('❌ Token verification failed:', error);
+        localStorage.removeItem('auth_token');
+        apiService.setToken(null);
+      }
     } else {
       console.log('👤 No existing token found');
-      setLoading(false);
     }
-  }, []);
-
-  const verifyToken = async () => {
-    try {
-      const response = await apiService.getProfile();
-      setUser(response.user);
-    } catch (error) {
-      console.error('Token verification failed:', error);
-      localStorage.removeItem('auth_token');
-    } finally {
-      setLoading(false);
-    }
+    setLoading(false);
   };
 
   const login = async (email: string, password: string) => {
@@ -62,26 +58,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     
     try {
-      console.log('📡 Calling API login...');
-      const response = await apiService.login(email, password);
-      console.log('✅ Login API response:', response);
+      const response = await apiService.login({ email, password });
+      console.log('✅ Login successful:', response);
       
-      if (response.access_token) {
-        localStorage.setItem('auth_token', response.access_token);
-        console.log('💾 Token saved to localStorage');
-        
-        const userData = response.user || {
-          id: response.user?.id || '',
-          email: email,
-          full_name: response.user?.full_name,
-        };
-        
-        console.log('👤 Setting user data:', userData);
-        setUser(userData);
-        console.log('🎉 Login successful!');
-      } else {
-        throw new Error('No access token in response');
-      }
+      // Your backend returns user, profile, and session data
+      setUser(response.user);
+      setProfile(response.profile);
+      console.log('🎉 User logged in successfully!');
       
     } catch (error) {
       console.error('❌ Login error:', error);
@@ -92,12 +75,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (email: string, password: string, name: string) => {
+    console.log('📝 Starting registration...', { email, name });
     setLoading(true);
+    
     try {
-      const response = await apiService.register(email, password, name);
-      localStorage.setItem('auth_token', response.access_token);
+      const response = await apiService.register({ 
+        email, 
+        password, 
+        full_name: name 
+      });
+      console.log('✅ Registration successful:', response);
+      
       setUser(response.user);
+      setProfile(response.profile);
+      console.log('🎉 User registered successfully!');
+      
     } catch (error) {
+      console.error('❌ Registration error:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -105,18 +99,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    console.log('👋 Logging out...');
     localStorage.removeItem('auth_token');
+    apiService.setToken(null);
     setUser(null);
+    setProfile(null);
+    console.log('✅ Logged out successfully');
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
+    profile,
     loading,
     login,
     register,
     logout,
     isAuthenticated: !!user,
-    isPremium: user?.subscription_tier !== 'free',
+    isPremium: false, // Will implement this when you add subscription data
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

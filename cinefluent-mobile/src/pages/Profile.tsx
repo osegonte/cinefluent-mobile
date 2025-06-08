@@ -1,3 +1,4 @@
+// src/pages/Profile.tsx - Fixed to use your actual user data structure
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,15 +23,16 @@ import {
 } from "lucide-react";
 
 const Profile = () => {
-  const { user, logout, isPremium } = useAuth();
+  const { user, profile, logout, isPremium } = useAuth();
 
   if (!user) return null;
 
-  // User data from auth context
+  // Use your actual backend data structure
   const userStats = {
-    name: user.name,
+    name: profile?.full_name || user.email.split('@')[0], // Fallback to email username part
     email: user.email,
-    memberSince: new Date(user.created_at).toLocaleDateString('en-US', { 
+    username: profile?.username || 'user',
+    memberSince: new Date(profile?.created_at || user.email_confirmed_at).toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'long' 
     }),
@@ -39,7 +41,9 @@ const Profile = () => {
     completedMovies: 3, // Will come from backend later
     wordsLearned: 347,  // Will come from backend later
     studyTime: "32h 15m", // Will come from backend later
-    isPremium: isPremium
+    isPremium: isPremium,
+    nativeLanguage: profile?.native_language || 'English',
+    learningLanguages: profile?.learning_languages || []
   };
 
   // Available languages for learning
@@ -72,7 +76,7 @@ const Profile = () => {
           <div className="flex items-center gap-4 mb-4">
             <Avatar className="w-16 h-16">
               <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                {userStats.name.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -138,6 +142,10 @@ const Profile = () => {
               <span className="text-muted-foreground">Study Time</span>
               <span className="font-semibold text-foreground tabular-nums">{userStats.studyTime}</span>
             </div>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Native Language</span>
+              <span className="font-semibold text-foreground">{userStats.nativeLanguage}</span>
+            </div>
           </div>
         </Card>
 
@@ -190,6 +198,18 @@ const Profile = () => {
                 </div>
               );
             })}
+          </div>
+        </Card>
+
+        {/* Debug Info (Remove this later) */}
+        <Card className="mobile-card p-4 mb-6 bg-gray-50 dark:bg-gray-800">
+          <h3 className="font-semibold text-foreground mb-2">🔧 Debug Info</h3>
+          <div className="text-xs space-y-1">
+            <p><strong>User ID:</strong> {user.id}</p>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Username:</strong> {profile?.username || 'Not set'}</p>
+            <p><strong>Full Name:</strong> {profile?.full_name || 'Not set'}</p>
+            <p><strong>Confirmed:</strong> {user.email_confirmed_at ? 'Yes' : 'No'}</p>
           </div>
         </Card>
 

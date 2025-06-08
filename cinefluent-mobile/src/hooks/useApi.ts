@@ -1,3 +1,4 @@
+// src/hooks/useApi.ts - Updated for your backend
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiService } from '@/lib/api';
 
@@ -14,11 +15,11 @@ export function useHealthCheck() {
 
 // Movies Hooks
 export function useMovies(params?: {
-  page?: number;
+  skip?: number;
   limit?: number;
   language?: string;
   difficulty?: string;
-  genre?: string;
+  category?: string;
 }) {
   return useQuery({
     queryKey: ['movies', params],
@@ -33,6 +34,12 @@ export function useFeaturedMovies() {
     queryKey: ['movies', 'featured'],
     queryFn: () => apiService.getFeaturedMovies(),
     staleTime: 10 * 60 * 1000, // 10 minutes
+    retry: (failureCount, error) => {
+      // If featured movies fail, don't retry too aggressively
+      return failureCount < 2;
+    },
+    // Fallback to regular movies if featured fails
+    placeholderData: { movies: [] },
   });
 }
 
@@ -42,6 +49,8 @@ export function useSearchMovies(query: string, enabled = true) {
     queryFn: () => apiService.searchMovies(query),
     enabled: enabled && query.length > 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    // Don't retry search queries as aggressively
+    retry: 1,
   });
 }
 
@@ -51,6 +60,7 @@ export function useCategories() {
     queryKey: ['categories'],
     queryFn: () => apiService.getCategories(),
     staleTime: 30 * 60 * 1000, // 30 minutes
+    retry: 2,
   });
 }
 
@@ -59,6 +69,7 @@ export function useLanguages() {
     queryKey: ['languages'],
     queryFn: () => apiService.getLanguages(),
     staleTime: 30 * 60 * 1000, // 30 minutes
+    retry: 2,
   });
 }
 
@@ -71,5 +82,6 @@ export function useConnectionStatus() {
     apiStatus: healthQuery.isSuccess ? 'connected' : healthQuery.isError ? 'disconnected' : 'checking',
     isConnected: navigator.onLine && healthQuery.isSuccess,
     healthData: healthQuery.data,
+    error: healthQuery.error,
   };
 }

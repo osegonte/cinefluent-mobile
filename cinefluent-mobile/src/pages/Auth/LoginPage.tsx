@@ -1,3 +1,4 @@
+// src/pages/Auth/LoginPage.tsx - Updated with test credentials
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,8 +10,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // Pre-fill with your test credentials
+  const [email, setEmail] = useState('enabled@example.com');
+  const [password, setPassword] = useState('TestPass123!');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -118,6 +120,13 @@ export default function LoginPage() {
             <Link to="/register" className="text-primary hover:underline font-medium">
               Sign up
             </Link>
+          </div>
+
+          {/* Test credentials helper */}
+          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Test Credentials (pre-filled):</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Email: enabled@example.com</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Password: TestPass123!</p>
           </div>
         </CardContent>
       </Card>
