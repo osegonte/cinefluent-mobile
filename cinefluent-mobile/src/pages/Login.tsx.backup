@@ -1,0 +1,231 @@
+// src/pages/Login.tsx - Simple Vite web version
+import React, { useState } from 'react';
+
+const API_BASE_URL = 'https://cinefluent-api-production.up.railway.app';
+
+export default function Login() {
+  const [email, setEmail] = useState('enabled@example.com');
+  const [password, setPassword] = useState('TestPass123!');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+
+    try {
+      console.log('🔐 Attempting login...');
+      
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      console.log('Login response:', data);
+
+      if (response.ok) {
+        setMessage('✅ Login successful! Redirecting...');
+        localStorage.setItem('auth_token', data.access_token || 'test-token');
+        setTimeout(() => {
+          window.location.href = '/learn';
+        }, 1000);
+      } else {
+        setMessage(`❌ Login failed: ${data.detail || data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setMessage(`❌ Network error: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      fontFamily: 'system-ui, -apple-system, sans-serif'
+    }}>
+      <div style={{
+        background: 'white',
+        padding: '2rem',
+        borderRadius: '12px',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+        width: '100%',
+        maxWidth: '400px',
+        margin: '1rem'
+      }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #667eea, #764ba2)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '0.5rem'
+          }}>
+            🎬 CineFluent
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
+            Learn languages through movies
+          </p>
+        </div>
+
+        {/* Message */}
+        {message && (
+          <div style={{
+            background: message.includes('✅') ? '#f0fdf4' : '#fef2f2',
+            border: `1px solid ${message.includes('✅') ? '#bbf7d0' : '#fecaca'}`,
+            borderRadius: '8px',
+            padding: '1rem',
+            marginBottom: '1rem',
+            color: message.includes('✅') ? '#059669' : '#dc2626',
+            fontWeight: '500'
+          }}>
+            {message}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleLogin}>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '0.5rem'
+            }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '1rem',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '0.5rem'
+            }}>
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '1rem',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              background: loading ? '#9ca3af' : 'linear-gradient(135deg, #667eea, #764ba2)',
+              color: 'white',
+              border: 'none',
+              padding: '0.875rem',
+              borderRadius: '6px',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            {loading ? '🔄 Signing In...' : '🚀 Sign In'}
+          </button>
+        </form>
+
+        {/* Test Credentials */}
+        <div style={{
+          background: '#f0fdf4',
+          border: '1px solid #bbf7d0',
+          borderRadius: '8px',
+          padding: '1rem',
+          marginTop: '1.5rem'
+        }}>
+          <h4 style={{
+            fontSize: '0.875rem',
+            fontWeight: '600',
+            color: '#059669',
+            margin: '0 0 0.5rem'
+          }}>
+            ✅ Test Credentials (Pre-filled):
+          </h4>
+          <p style={{
+            fontSize: '0.75rem',
+            color: '#047857',
+            margin: 0,
+            lineHeight: '1.4'
+          }}>
+            Email: enabled@example.com<br/>
+            Password: TestPass123!
+          </p>
+        </div>
+
+        {/* Debug Info */}
+        <div style={{
+          background: '#eff6ff',
+          border: '1px solid #bfdbfe',
+          borderRadius: '8px',
+          padding: '0.75rem',
+          marginTop: '1rem'
+        }}>
+          <h4 style={{
+            fontSize: '0.75rem',
+            fontWeight: '600',
+            color: '#1e40af',
+            margin: '0 0 0.25rem'
+          }}>
+            🐛 Debug Info:
+          </h4>
+          <p style={{
+            fontSize: '0.625rem',
+            color: '#1e40af',
+            margin: 0,
+            lineHeight: '1.3'
+          }}>
+            API: {API_BASE_URL}<br/>
+            Platform: Vite React Web<br/>
+            Status: Ready to test
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

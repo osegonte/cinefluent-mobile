@@ -1,25 +1,13 @@
 // src/lib/api.ts
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://cinefluent-api-production.up.railway.app';
 
-export interface User {
-  id: string;
-  email: string;
-  role: string;
-  email_confirmed_at?: string;
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }
 
-export interface UserProfile {
-  id: string;
-  username?: string;
-  full_name?: string;
-  avatar_url?: string;
-  native_language: string;
-  learning_languages: string[];
-  learning_goals: object;
-  created_at?: string;
-}
-
-export interface Movie {
+interface Movie {
   id: string;
   title: string;
   description: string;
@@ -29,218 +17,143 @@ export interface Movie {
   languages: string[];
   genres: string[];
   thumbnail_url: string;
-  video_url?: string;
+  video_url: string | null;
   is_premium: boolean;
   vocabulary_count: number;
-  imdb_rating?: number;
+  imdb_rating: number;
 }
 
-export interface AuthResponse {
-  user: User;
-  profile?: UserProfile;
-  access_token: string;
-  refresh_token?: string;
-  token_type: string;
-  expires_in?: number;
-  message: string;
+interface MoviesResponse {
+  movies: Movie[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
+interface MoviesParams {
+  page?: number;
+  limit?: number;
+  language?: string;
+  difficulty?: string;
+  genre?: string;
 }
 
 class ApiService {
-  private baseURL: string;
-  private token: string | null = null;
-
-  constructor() {
-    this.baseURL = API_BASE_URL;
-    this.token = localStorage.getItem('access_token');
-  }
-
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+  private async makeRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    const url = `${API_BASE_URL}${endpoint}`;
     
-    const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
-        ...options.headers,
-      },
-      ...options,
-    };
-
+    console.log(`🌐 API Request: ${url}`);
+    
     try {
-      console.log(`API Request: ${config.method || 'GET'} ${url}`);
-      const response = await fetch(url, config);
-      
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+        ...options,
+      });
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log(`API Response: ${url}`, data);
+      console.log(`✅ API Response for ${endpoint}:`, data);
       return data;
     } catch (error) {
-      console.error(`API Error: ${url}`, error);
+      console.error(`❌ API Error for ${endpoint}:`, error);
       throw error;
     }
   }
 
-  setToken(token: string) {
-    this.token = token;
-    localStorage.setItem('access_token', token);
-  }
-
-  clearToken() {
-    this.token = null;
-    localStorage.removeItem('access_token');
-  }
-
   // Health check
   async healthCheck() {
-    return this.request('/api/v1/health');
-  }
-
-  // Authentication endpoints
-  async register(email: string, password: string, fullName?: string): Promise<AuthResponse> {
-    const response = await this.request<AuthResponse>('/api/v1/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({
-        email,
-        password,
-        full_name: fullName,
-      }),
-    });
-    
-    if (response.access_token) {
-      this.setToken(response.access_token);
-    }
-    
-    return response;
-  }
-
-  async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await this.request<AuthResponse>('/api/v1/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
-    
-    if (response.access_token) {
-      this.setToken(response.access_token);
-    }
-    
-    return response;
-  }
-
-  async logout() {
-    try {
-      await this.request('/api/v1/auth/logout', {
-        method: 'POST',
-      });
-    } catch (error) {
-      console.warn('Logout request failed:', error);
-    } finally {
-      this.clearToken();
-    }
-  }
-
-  async getCurrentUser(): Promise<{ user: User; profile: UserProfile }> {
-    return this.request('/api/v1/auth/me');
-  }
-
-  async refreshToken(refreshToken: string): Promise<AuthResponse> {
-    const response = await this.request<AuthResponse>('/api/v1/auth/refresh', {
-      method: 'POST',
-      body: JSON.stringify({
-        refresh_token: refreshToken,
-      }),
-    });
-    
-    if (response.access_token) {
-      this.setToken(response.access_token);
-    }
-    
-    return response;
+    return this.makeRequest('/');
   }
 
   // Movies endpoints
-  async getMovies(params: {
-    page?: number;
-    limit?: number;
-    language?: string;
-    difficulty?: string;
-    genre?: string;
-  } = {}): Promise<{
-    movies: Movie[];
-    total: number;
-    page: number;
-    per_page: number;
-  }> {
+  async getMovies(params: MoviesParams = {}): Promise<MoviesResponse> {
     const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
-        searchParams.append(key, value.toString());
-      }
+    
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('per_page', params.limit.toString());
+    if (params.language) searchParams.append('language', params.language);
+    if (params.difficulty) searchParams.append('difficulty', params.difficulty);
+    if (params.genre) searchParams.append('genre', params.genre);
+
+    const query = searchParams.toString();
+    const endpoint = `/api/v1/movies${query ? `?${query}` : ''}`;
+    
+    return this.makeRequest<MoviesResponse>(endpoint);
+  }
+
+  async getFeaturedMovies(): Promise<MoviesResponse> {
+    // For now, return the same as getMovies since your API doesn't have a featured endpoint
+    // You can implement this later with a specific endpoint
+    return this.getMovies({ limit: 6 });
+  }
+
+  async searchMovies(query: string): Promise<MoviesResponse> {
+    const searchParams = new URLSearchParams({
+      search: query,
     });
     
-    const queryString = searchParams.toString();
-    const endpoint = `/api/v1/movies${queryString ? `?${queryString}` : ''}`;
-    
-    return this.request(endpoint);
+    return this.makeRequest<MoviesResponse>(`/api/v1/movies?${searchParams.toString()}`);
   }
 
-  async getFeaturedMovies(): Promise<{ movies: Movie[] }> {
-    return this.request('/api/v1/movies/featured');
+  async getMovie(movieId: string): Promise<Movie> {
+    return this.makeRequest<Movie>(`/api/v1/movies/${movieId}`);
   }
 
-  async searchMovies(query: string, limit = 10): Promise<{
-    movies: Movie[];
-    query: string;
-    total: number;
-  }> {
-    return this.request(`/api/v1/movies/search?q=${encodeURIComponent(query)}&limit=${limit}`);
-  }
-
-  async getMovie(movieId: string): Promise<{
-    movie: Movie;
-    user_progress?: any;
-  }> {
-    return this.request(`/api/v1/movies/${movieId}`);
-  }
-
-  // Progress endpoints
-  async updateProgress(movieId: string, progressData: {
-    progress_percentage: number;
-    time_watched: number;
-    vocabulary_learned?: number;
-  }) {
-    return this.request('/api/v1/progress/update', {
-      method: 'POST',
-      body: JSON.stringify({
-        movie_id: movieId,
-        ...progressData,
-      }),
-    });
-  }
-
+  // Progress endpoints (implement these when your backend has them)
   async getProgressStats() {
-    return this.request('/api/v1/progress/stats');
+    // Placeholder - implement when backend is ready
+    return {
+      movies_completed: 0,
+      words_learned: 0,
+      study_streak: 0,
+      total_study_time: 0,
+    };
   }
 
   // Metadata endpoints
   async getCategories() {
-    return this.request('/api/v1/categories');
+    // Extract from movies data or implement backend endpoint
+    const movies = await this.getMovies();
+    const genres = new Set<string>();
+    movies.movies.forEach(movie => {
+      movie.genres.forEach(genre => genres.add(genre));
+    });
+    return Array.from(genres).map(genre => ({ id: genre, name: genre }));
   }
 
   async getLanguages() {
-    return this.request('/api/v1/languages');
+    // Extract from movies data or implement backend endpoint
+    const movies = await this.getMovies();
+    const languages = new Set<string>();
+    movies.movies.forEach(movie => {
+      movie.languages.forEach(lang => languages.add(lang));
+    });
+    return Array.from(languages).map(lang => ({ code: lang, name: lang }));
   }
 }
 
-// Export singleton instance
 export const apiService = new ApiService();
+
+// Export individual functions for backward compatibility
+export const api = {
+  get: <T>(endpoint: string) => apiService.makeRequest<T>(endpoint),
+  post: <T>(endpoint: string, data: any) => apiService.makeRequest<T>(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  put: <T>(endpoint: string, data: any) => apiService.makeRequest<T>(endpoint, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  delete: <T>(endpoint: string) => apiService.makeRequest<T>(endpoint, {
+    method: 'DELETE',
+  }),
+};
+
 export default apiService;

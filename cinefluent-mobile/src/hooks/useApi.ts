@@ -1,84 +1,82 @@
-// src/hooks/useApi.ts - Updated for your backend
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+// src/hooks/useApi.ts
+import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/lib/api';
 
-// Health Check Hook
-export function useHealthCheck() {
-  return useQuery({
-    queryKey: ['health'],
-    queryFn: () => apiService.healthCheck(),
-    refetchInterval: 30000, // Check every 30 seconds
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
-}
-
-// Movies Hooks
-export function useMovies(params?: {
-  skip?: number;
+// Movies hooks
+export const useMovies = (params?: {
+  page?: number;
   limit?: number;
   language?: string;
   difficulty?: string;
-  category?: string;
-}) {
+  genre?: string;
+}) => {
   return useQuery({
     queryKey: ['movies', params],
-    queryFn: () => apiService.getMovies(params),
+    queryFn: () => apiService.getMovies(params || {}),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    retry: 2,
   });
-}
+};
 
-export function useFeaturedMovies() {
+export const useFeaturedMovies = () => {
   return useQuery({
-    queryKey: ['movies', 'featured'],
+    queryKey: ['featured-movies'],
     queryFn: () => apiService.getFeaturedMovies(),
     staleTime: 10 * 60 * 1000, // 10 minutes
-    retry: (failureCount, error) => {
-      return failureCount < 2;
-    },
-    placeholderData: { movies: [] },
+    retry: 2,
   });
-}
+};
 
-export function useSearchMovies(query: string, enabled = true) {
+export const useSearchMovies = (query: string, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['movies', 'search', query],
+    queryKey: ['search-movies', query],
     queryFn: () => apiService.searchMovies(query),
-    enabled: enabled && query.length > 2,
+    enabled: enabled && query.length > 0,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    retry: 1,
   });
-}
+};
 
-// Categories and Languages
-export function useCategories() {
+export const useMovie = (movieId: string) => {
+  return useQuery({
+    queryKey: ['movie', movieId],
+    queryFn: () => apiService.getMovie(movieId),
+    enabled: !!movieId,
+    staleTime: 10 * 60 * 1000,
+  });
+};
+
+// Progress hooks
+export const useProgressStats = () => {
+  return useQuery({
+    queryKey: ['progress-stats'],
+    queryFn: () => apiService.getProgressStats(),
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// Metadata hooks
+export const useCategories = () => {
   return useQuery({
     queryKey: ['categories'],
     queryFn: () => apiService.getCategories(),
-    staleTime: 30 * 60 * 1000, // 30 minutes
-    retry: 2,
+    staleTime: 30 * 60 * 1000, // 30 minutes - categories don't change often
   });
-}
+};
 
-export function useLanguages() {
+export const useLanguages = () => {
   return useQuery({
     queryKey: ['languages'],
     queryFn: () => apiService.getLanguages(),
     staleTime: 30 * 60 * 1000, // 30 minutes
-    retry: 2,
   });
-}
+};
 
-// Connection Status Hook
-export function useConnectionStatus() {
-  const healthQuery = useHealthCheck();
-  
-  return {
-    isOnline: navigator.onLine,
-    apiStatus: healthQuery.isSuccess ? 'connected' : healthQuery.isError ? 'disconnected' : 'checking',
-    isConnected: navigator.onLine && healthQuery.isSuccess,
-    healthData: healthQuery.data,
-    error: healthQuery.error,
-  };
-}
+// Health check hook for debugging
+export const useHealthCheck = () => {
+  return useQuery({
+    queryKey: ['health-check'],
+    queryFn: () => apiService.healthCheck(),
+    staleTime: 60 * 1000, // 1 minute
+    retry: 1,
+  });
+};
