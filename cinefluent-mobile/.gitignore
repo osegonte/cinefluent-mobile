@@ -27,3 +27,4 @@ android/
 # API keys and secrets
 *.key
 *.pem
+.vercel
