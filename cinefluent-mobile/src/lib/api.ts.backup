@@ -1,5 +1,5 @@
 // src/lib/api.ts - FIXED DNS ISSUE
-const API_BASE = 'https://cinefluent-api-production.up.railway.app';
+const API_BASE = 'https://cinefluent-api-production-5082.up.railway.app'; // Hardcode to avoid env issues
 
 export interface Movie {
   id: string;
