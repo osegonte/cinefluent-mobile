@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './components/ThemeProvider';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { NavigationTabs } from './components/NavigationTabs';
+import { Toaster } from './components/ui/sonner';
 
 // Auth Pages
 import LoginPage from './pages/Auth/LoginPage';
@@ -16,8 +18,9 @@ import Progress from './pages/Progress';
 import Community from './pages/Community';
 import Profile from './pages/Profile';
 
-// Optional Pages (commented out if not available)
-// import LessonView from './pages/LessonView';
+// Optional Pages
+import LessonView from './pages/LessonView';
+import MovieDetailPage from './pages/MovieDetailPage';
 
 import './index.css';
 
@@ -46,20 +49,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Simple auth check (you can enhance this with proper ProtectedRoute later)
-function useAuth() {
-  const token = localStorage.getItem('auth_token');
-  return { isAuthenticated: !!token };
-}
-
 // Protected Routes Wrapper
 function ProtectedApp() {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
   return (
     <AppLayout>
       <Routes>
@@ -69,6 +60,10 @@ function ProtectedApp() {
         <Route path="/progress" element={<Progress />} />
         <Route path="/community" element={<Community />} />
         <Route path="/profile" element={<Profile />} />
+        
+        {/* Movie Learning Routes */}
+        <Route path="/movie/:movieId" element={<MovieDetailPage />} />
+        <Route path="/movie/:movieId/lesson/:sceneId" element={<LessonView />} />
         
         {/* Catch all - redirect to learn */}
         <Route path="*" element={<Navigate to="/learn" replace />} />
@@ -90,8 +85,15 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 
                 {/* Protected App Routes */}
-                <Route path="/*" element={<ProtectedApp />} />
+                <Route path="/*" element={
+                  <ProtectedRoute>
+                    <ProtectedApp />
+                  </ProtectedRoute>
+                } />
               </Routes>
+              
+              {/* Global Toast Notifications */}
+              <Toaster />
             </div>
           </Router>
         </AuthProvider>
